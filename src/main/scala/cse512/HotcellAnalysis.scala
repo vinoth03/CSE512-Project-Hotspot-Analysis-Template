@@ -2,7 +2,6 @@ package cse512
 
 import org.apache.log4j.{Level, Logger}
 import org.apache.spark.sql.{DataFrame, SparkSession}
-import org.apache.spark.sql.functions.udf
 import org.apache.spark.sql.functions._
 
 object HotcellAnalysis {
@@ -43,6 +42,15 @@ def runHotcellAnalysis(spark: SparkSession, pointPath: String): DataFrame =
   val numCells = (maxX - minX + 1)*(maxY - minY + 1)*(maxZ - minZ + 1)
 
   // YOU NEED TO CHANGE THIS PART
+  spark.udf.register("filter",(inputX: Int, inputY: Int, inputZ: Int)=>
+    HotcellUtils.filterCoordinate(inputX, inputY, inputZ, minX.toInt, minY.toInt, minZ.toInt, maxX.toInt, maxY.toInt, maxZ.toInt))
+  pickupInfo.createOrReplaceTempView("nyctaxitrips")
+  pickupInfo = spark.sql("select * from nyctaxitrips where filter(nyctaxitrips.x,nyctaxitrips.y,nyctaxitrips.z)")
+  pickupInfo = pickupInfo.select(concat(pickupInfo.col("x"), lit(","), pickupInfo.col("y"),lit(","), pickupInfo.col("z")).alias("cellId"))
+  pickupInfo = pickupInfo.groupBy("cellId").agg(count("cellId").alias("hotness"))
+  pickupInfo.show()
+
+  val pickupInfoRdd = pickupInfo.rdd.map(row => (row.getString(0),row.getInt(1)))
 
   return pickupInfo // YOU NEED TO CHANGE THIS PART
 }

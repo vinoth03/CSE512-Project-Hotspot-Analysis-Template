@@ -48,4 +48,15 @@ object HotcellUtils {
   }
 
   // YOU NEED TO CHANGE THIS PART
+
+  def filterCoordinate(inputX: Int, inputY: Int, inputZ:Int, minX: Int, minY: Int, minZ: Int, maxX: Int, maxY:Int, maxZ: Int ): Boolean =
+  {
+    if(inputX < minX || inputX > maxX)
+      false
+    if(inputY < minY || inputY > maxY)
+      false
+    if(inputZ < minZ || inputZ > maxZ)
+      false
+    true
+  }
 }
