@@ -56,7 +56,7 @@ def runHotcellAnalysis(spark: SparkSession, pointPath: String): DataFrame =
   spark.udf.register("Zscore",(cellId: String)=> HotcellUtils.calculateZScore(cellId, pickupInfoMap, mean, sd, minX.toInt, minY.toInt, minZ.toInt, maxX.toInt, maxY.toInt, maxZ.toInt, numCells.toInt))
   pickupInfo = spark.sql("select nyctaxitrips.cellId,Zscore(nyctaxitrips.cellId) as zscore from nyctaxitrips")
   pickupInfo = pickupInfo.sort(desc("zscore"))
-  //pickupInfo = pickupInfo.selectExpr("split(cellId, ',')[0] as x","split(cellId, ',')[1] as y","split(cellId, ',')[2] as z")
+  pickupInfo = pickupInfo.selectExpr("split(cellId, ',')[0] as x","split(cellId, ',')[1] as y","split(cellId, ',')[2] as z")
   pickupInfo // YOU NEED TO CHANGE THIS PART
 }
 }
